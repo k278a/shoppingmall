@@ -19,7 +19,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponse> signupUser(@RequestBody SignupRequest request) throws Exception {
+    public ResponseEntity<SignupResponse> signupUser(@RequestBody SignupRequest request) {
         SignupResponse response = userService.signupUser(request);
         return ResponseEntity.ok(response);
     }
