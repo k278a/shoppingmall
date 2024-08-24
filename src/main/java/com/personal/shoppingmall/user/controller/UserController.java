@@ -1,6 +1,7 @@
 package com.personal.shoppingmall.user.controller;
 
-
+import com.personal.shoppingmall.user.dto.LoginRequest;
+import com.personal.shoppingmall.user.dto.LoginResponse;
 import com.personal.shoppingmall.user.dto.SignupRequest;
 import com.personal.shoppingmall.user.dto.SignupResponse;
 import com.personal.shoppingmall.user.service.UserService;
@@ -18,7 +19,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponse> signupUser(@RequestBody SignupRequest request) throws Exception {
+    public ResponseEntity<SignupResponse> signupUser(@RequestBody SignupRequest request) {
         SignupResponse response = userService.signupUser(request);
         return ResponseEntity.ok(response);
     }
@@ -27,5 +28,10 @@ public class UserController {
     public ResponseEntity<String> verifyEmail(@PathVariable String token) {
         String message = userService.verifyEmail(token);
         return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest request) {
+        return userService.loginUser(request);
     }
 }

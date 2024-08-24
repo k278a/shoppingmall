@@ -40,6 +40,12 @@ dependencies {
     //email
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    // JAXB API dependency
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+    // JAXB Runtime dependency
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
