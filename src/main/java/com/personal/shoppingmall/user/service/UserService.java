@@ -20,9 +20,6 @@ public class UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    private static final String EMAIL_PATTERN = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
-    private static final String PHONE_PATTERN = "^010\\d{8}$";
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EncryptionService encryptionService;
@@ -98,18 +95,17 @@ public class UserService {
     }
 
     private boolean isPasswordValid(String password) {
-        // 비밀번호 검증을 위한 정규 표현식
-        String passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+        final String passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
         return Pattern.matches(passwordPattern, password);
     }
 
     private boolean isEmailValid(String email) {
-        // 이메일 검증을 위한 정규 표현식
-        return Pattern.matches(EMAIL_PATTERN, email);
+        final String emailPattern = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+        return Pattern.matches(emailPattern, email);
     }
 
     private boolean isPhoneNumberValid(String phoneNumber) {
-        // 전화번호 검증을 위한 정규 표현식
-        return Pattern.matches(PHONE_PATTERN, phoneNumber);
+        final String phonePattern = "^010\\d{8}$";
+        return Pattern.matches(phonePattern, phoneNumber);
     }
 }
