@@ -4,7 +4,10 @@ import com.personal.shoppingmall.email.service.EmailService;
 import com.personal.shoppingmall.email.service.EmailVerificationService;
 import com.personal.shoppingmall.exception.CustomException;
 import com.personal.shoppingmall.exception.ErrorCodes;
+import com.personal.shoppingmall.security.jwt.JwtTokenProvider;
 import com.personal.shoppingmall.security.util.EncryptionService;
+import com.personal.shoppingmall.user.dto.LoginRequest;
+import com.personal.shoppingmall.user.dto.LoginResponse;
 import com.personal.shoppingmall.user.dto.SignupRequest;
 import com.personal.shoppingmall.user.dto.SignupResponse;
 import com.personal.shoppingmall.user.entity.User;
@@ -12,9 +15,13 @@ import com.personal.shoppingmall.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
@@ -27,18 +34,21 @@ public class UserService {
     private final EncryptionService encryptionService;
     private final EmailService emailService;
     private final EmailVerificationService emailVerificationService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        EncryptionService encryptionService,
                        EmailService emailService,
-                       EmailVerificationService emailVerificationService) {
+                       EmailVerificationService emailVerificationService,
+                       JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.encryptionService = encryptionService;
         this.emailService = emailService;
         this.emailVerificationService = emailVerificationService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     public SignupResponse signupUser(SignupRequest request) {
@@ -125,5 +135,34 @@ public class UserService {
 
     public String verifyEmail(String token) {
         return emailVerificationService.verifyEmail(token);
+    }
+
+    public ResponseEntity<LoginResponse> loginUser(LoginRequest request) {
+        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
+        if (userOpt.isEmpty()) {
+            logger.warn("사용자 찾을 수 없음: {}", request.getEmail());
+            throw new CustomException(ErrorCodes.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+        }
+
+        User user = userOpt.get();
+
+        // 이메일 인증 여부 확인
+        if (!user.isVerified()) {
+            logger.warn("이메일 인증되지 않음: {}", request.getEmail());
+            throw new CustomException(ErrorCodes.EMAIL_NOT_VERIFIED, "이메일 인증이 필요합니다. 이메일을 확인하세요.");
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            logger.warn("비밀번호 불일치: {}", request.getEmail());
+            throw new CustomException(ErrorCodes.INVALID_PASSWORD, "비밀번호가 잘못되었습니다.");
+        }
+
+        String jwtToken = jwtTokenProvider.createToken(user.getEmail());
+        logger.info("로그인 성공: {} - JWT 토큰 생성", user.getEmail());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken);
+
+        return new ResponseEntity<>(new LoginResponse("로그인 성공"), headers, HttpStatus.OK);
     }
 }
