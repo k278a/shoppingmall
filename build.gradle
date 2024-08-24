@@ -24,9 +24,19 @@ repositories {
 }
 
 dependencies {
+
+    // JPA 설정
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // MySQL
+    implementation 'mysql:mysql-connector-java:8.0.28'
+    // Spring Boot Starter Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // JWT Library
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+//    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
