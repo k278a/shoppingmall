@@ -20,6 +20,12 @@ public class ErrorCodes {
     public static final String INVALID_EMAIL_FORMAT = USER_INPUT_ERROR_PREFIX + "INVALID_EMAIL_FORMAT";
     public static final String INVALID_PHONE_NUMBER_FORMAT = USER_INPUT_ERROR_PREFIX + "INVALID_PHONE_NUMBER_FORMAT";
 
+    // 판매자 관련 오류 코드
+    public static final String SELLER_ERROR_PREFIX = "SELLER_ERROR_";
+    public static final String SELLER_EMAIL_ALREADY_SIGNED_UP = SELLER_ERROR_PREFIX + "EMAIL_ALREADY_SIGNED_UP";
+    public static final String SELLER_PASSWORD_MISMATCH = SELLER_ERROR_PREFIX + "PASSWORD_MISMATCH";
+    public static final String SELLER_PASSWORD_VALIDATION_FAILED = SELLER_ERROR_PREFIX + "PASSWORD_VALIDATION_FAILED";
+
     // 이메일 인증 관련
-    public static final String INVALID_TOKEN = USER_ERROR_PREFIX + "INVALID_TOKEN";
+    public static final String INVALID_TOKEN = "INVALID_TOKEN";
 }
