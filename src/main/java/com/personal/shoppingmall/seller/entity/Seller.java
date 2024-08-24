@@ -1,6 +1,5 @@
 package com.personal.shoppingmall.seller.entity;
 
-import com.personal.shoppingmall.security.util.EncryptionService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

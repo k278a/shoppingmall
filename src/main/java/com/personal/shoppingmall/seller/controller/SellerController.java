@@ -19,7 +19,7 @@ public class SellerController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SellerSignupResponseDto> signupSeller(@RequestBody SellerSignupRequestDto sellerRequestDto) throws Exception {
+    public ResponseEntity<SellerSignupResponseDto> signupSeller(@RequestBody SellerSignupRequestDto sellerRequestDto) {
         SellerSignupResponseDto responseDto = sellerService.signupSeller(sellerRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
