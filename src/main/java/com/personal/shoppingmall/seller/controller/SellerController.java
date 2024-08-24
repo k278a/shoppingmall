@@ -1,8 +1,11 @@
 package com.personal.shoppingmall.seller.controller;
 
+import com.personal.shoppingmall.seller.dto.SellerLoginRequestDto;
+import com.personal.shoppingmall.seller.dto.SellerLoginResponseDto;
 import com.personal.shoppingmall.seller.dto.SellerSignupRequestDto;
 import com.personal.shoppingmall.seller.dto.SellerSignupResponseDto;
 import com.personal.shoppingmall.seller.service.SellerService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +18,6 @@ public class SellerController {
 
     public SellerController(SellerService sellerService) {
         this.sellerService = sellerService;
-
     }
 
     @PostMapping("/signup")
@@ -30,4 +32,8 @@ public class SellerController {
         return ResponseEntity.ok("Email verified successfully.");
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<SellerLoginResponseDto> loginSeller(@RequestBody SellerLoginRequestDto loginRequestDto) {
+        return sellerService.loginSeller(loginRequestDto);
+    }
 }
