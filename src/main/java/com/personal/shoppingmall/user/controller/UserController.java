@@ -5,10 +5,7 @@ import com.personal.shoppingmall.user.dto.SignupRequest;
 import com.personal.shoppingmall.user.dto.SignupResponse;
 import com.personal.shoppingmall.user.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,4 +23,9 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/verify/{token}")
+    public ResponseEntity<String> verifyEmail(@PathVariable String token) {
+        String message = userService.verifyEmail(token);
+        return ResponseEntity.ok(message);
+    }
 }
