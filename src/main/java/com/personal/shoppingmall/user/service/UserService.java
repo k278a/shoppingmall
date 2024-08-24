@@ -20,6 +20,9 @@ public class UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
+    private static final String EMAIL_PATTERN = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+    private static final String PHONE_PATTERN = "^010\\d{8}$";
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EncryptionService encryptionService;
@@ -36,6 +39,12 @@ public class UserService {
     public SignupResponse signupUser(SignupRequest request) {
         logger.info("회원가입 요청 수신: {}", request);
 
+        // 이메일 형식 검증
+        if (!isEmailValid(request.getEmail())) {
+            logger.warn("이메일 형식 오류: {}", request.getEmail());
+            throw new CustomException(ErrorCodes.INVALID_EMAIL_FORMAT, "유효하지 않은 이메일 형식입니다.");
+        }
+
         // 이메일 중복 확인
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             logger.warn("이메일 중복: {}", request.getEmail());
@@ -51,12 +60,18 @@ public class UserService {
         logger.info("비밀번호 일치 확인 통과");
 
         // 비밀번호 검증
-        boolean isPasswordValid = isPasswordValid(request.getPassword());
-        logger.info("비밀번호 검증 결과: {}", isPasswordValid);
-        if (!isPasswordValid) {
+        if (!isPasswordValid(request.getPassword())) {
             logger.warn("비밀번호 검증 실패: 비밀번호는 대문자, 소문자, 숫자 및 특수문자를 포함해야 합니다.");
             throw new CustomException(ErrorCodes.PASSWORD_VALIDATION_FAILED, "비밀번호는 대문자, 소문자, 숫자 및 특수문자를 포함해야 합니다.");
         }
+        logger.info("비밀번호 검증 통과");
+
+        // 전화번호 형식 검증
+        if (!isPhoneNumberValid(request.getPhoneNumber())) {
+            logger.warn("전화번호 형식 오류: {}", request.getPhoneNumber());
+            throw new CustomException(ErrorCodes.INVALID_PHONE_NUMBER_FORMAT, "유효하지 않은 전화번호 형식입니다.");
+        }
+        logger.info("전화번호 형식 확인 통과: {}", request.getPhoneNumber());
 
         // 비밀번호 및 기타 필드 암호화
         String encryptedPassword = passwordEncoder.encode(request.getPassword());
@@ -85,9 +100,16 @@ public class UserService {
     private boolean isPasswordValid(String password) {
         // 비밀번호 검증을 위한 정규 표현식
         String passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
-        boolean isValid = Pattern.matches(passwordPattern, password);
-        logger.info("비밀번호 검증 패턴: {}", passwordPattern);
-        logger.info("비밀번호 검증: {} -> {}", password, isValid);
-        return isValid;
+        return Pattern.matches(passwordPattern, password);
+    }
+
+    private boolean isEmailValid(String email) {
+        // 이메일 검증을 위한 정규 표현식
+        return Pattern.matches(EMAIL_PATTERN, email);
+    }
+
+    private boolean isPhoneNumberValid(String phoneNumber) {
+        // 전화번호 검증을 위한 정규 표현식
+        return Pattern.matches(PHONE_PATTERN, phoneNumber);
     }
 }
