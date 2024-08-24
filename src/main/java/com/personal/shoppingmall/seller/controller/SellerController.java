@@ -24,4 +24,10 @@ public class SellerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+        sellerService.verifyEmail(token);
+        return ResponseEntity.ok("Email verified successfully.");
+    }
+
 }
