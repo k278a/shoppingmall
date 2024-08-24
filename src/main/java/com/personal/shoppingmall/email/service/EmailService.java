@@ -1,6 +1,7 @@
 package com.personal.shoppingmall.email.service;
 
 
+import com.personal.shoppingmall.seller.entity.Seller;
 import com.personal.shoppingmall.user.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -27,6 +28,20 @@ public class  EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
+        message.setSubject(subject);
+        message.setText(text);
+
+        mailSender.send(message);
+    }
+
+    public void sendVerificationEmail(Seller seller, String token) {
+        String subject = "Email Verification";
+        String confirmationUrl = verificationUrl + "/" + token;
+
+        String text = "Please verify your email by clicking the link below:\n" + confirmationUrl;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(seller.getEmail());
         message.setSubject(subject);
         message.setText(text);
 

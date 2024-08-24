@@ -22,7 +22,11 @@ public class Seller {
     private String encryptedBusinessNumber;
     private String encryptedBusinessName;
     private String encryptedBusinessAddress;
+    private boolean verified; // 인증 상태
 
+    public void updateVerifiedStatus(boolean verified) {
+        this.verified = verified;
+    }
 
     // 더 이상 인증 상태와 역할 관련 메서드 제거됨
 }

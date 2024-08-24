@@ -1,5 +1,7 @@
 package com.personal.shoppingmall.seller.service;
 
+import com.personal.shoppingmall.email.service.EmailService;
+import com.personal.shoppingmall.email.service.EmailVerificationService;
 import com.personal.shoppingmall.exception.CustomException;
 import com.personal.shoppingmall.exception.ErrorCodes;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,11 +25,15 @@ public class SellerService {
 
     private final SellerRepository sellerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final EmailVerificationService emailVerificationService;
 
 
-    public SellerService(SellerRepository sellerRepository, PasswordEncoder passwordEncoder) {
+    public SellerService(SellerRepository sellerRepository, PasswordEncoder passwordEncoder, EmailService emailService, EmailVerificationService emailVerificationService) {
         this.sellerRepository = sellerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @Transactional
@@ -70,7 +76,13 @@ public class SellerService {
 
         sellerRepository.save(seller);
 
-        return new SellerSignupResponseDto("회원가입 성공");
+        // 이메일 인증 토큰 생성 및 발송
+        String token = emailVerificationService.generateVerificationToken(seller);
+        emailService.sendVerificationEmail(seller, token);
+
+        logger.info("판매자 회원가입 성공: {} - 인증 이메일을 발송했습니다.", request.getEmail());
+
+        return new SellerSignupResponseDto("회원가입 성공. 인증 이메일을 확인하세요.");
     }
 
     // 비밀번호 유효성 검사
@@ -78,5 +90,9 @@ public class SellerService {
         // 비밀번호는 최소 8자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 함
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
         return Pattern.compile(regex).matcher(password).matches();
+    }
+
+    public String verifyEmail(String token) {
+        return emailVerificationService.verifyEmail(token);
     }
 }
