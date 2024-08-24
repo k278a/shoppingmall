@@ -1,5 +1,7 @@
 package com.personal.shoppingmall.user.service;
 
+import com.personal.shoppingmall.email.service.EmailService;
+import com.personal.shoppingmall.email.service.EmailVerificationService;
 import com.personal.shoppingmall.exception.CustomException;
 import com.personal.shoppingmall.exception.ErrorCodes;
 import com.personal.shoppingmall.security.util.EncryptionService;
@@ -23,14 +25,20 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EncryptionService encryptionService;
+    private final EmailService emailService;
+    private final EmailVerificationService emailVerificationService;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       EncryptionService encryptionService) {
+                       EncryptionService encryptionService,
+                       EmailService emailService,
+                       EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.encryptionService = encryptionService;
+        this.emailService = emailService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     public SignupResponse signupUser(SignupRequest request) {
@@ -89,9 +97,15 @@ public class UserService {
         );
         userRepository.save(user);
 
-        logger.info("사용자 저장 성공: {}", user.getEmail());
+        // 이메일 인증 토큰 생성
+        String token = emailVerificationService.generateVerificationToken(user);
 
-        return new SignupResponse("회원가입 성공.");
+        // 이메일 발송
+        emailService.sendVerificationEmail(user, token);
+
+        logger.info("이메일 인증 토큰 생성 및 발송 완료: {}", token);
+
+        return new SignupResponse("회원가입 성공. 인증 이메일을 확인하세요.");
     }
 
     private boolean isPasswordValid(String password) {
@@ -107,5 +121,9 @@ public class UserService {
     private boolean isPhoneNumberValid(String phoneNumber) {
         final String phonePattern = "^010\\d{8}$";
         return Pattern.matches(phonePattern, phoneNumber);
+    }
+
+    public String verifyEmail(String token) {
+        return emailVerificationService.verifyEmail(token);
     }
 }

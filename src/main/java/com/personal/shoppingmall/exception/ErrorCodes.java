@@ -17,5 +17,8 @@ public class ErrorCodes {
     public static final String INVALID_EMAIL_FORMAT = USER_INPUT_ERROR_PREFIX + "INVALID_EMAIL_FORMAT";
     public static final String INVALID_PHONE_NUMBER_FORMAT = USER_INPUT_ERROR_PREFIX + "INVALID_PHONE_NUMBER_FORMAT";
 
-    // 추가적인 오류 코드는 여기에 필요에 따라 추가할 수 있습니다
+    // 이메일 인증 관련
+    public static final String INVALID_TOKEN = USER_ERROR_PREFIX + "INVALID_TOKEN";
+
+
 }

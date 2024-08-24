@@ -25,14 +25,18 @@ public class User {
     private String phoneNumber; // 암호화된 전화번호
     private String address; // 암호화된 주소
 
-    // Constructor with parameters
+    private boolean verified;
+
     public User(String name, String email, String password, String phoneNumber, String address) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.verified = false; // 기본값으로 인증되지 않은 상태
     }
 
-    // Methods to handle role-related logic are removed
+    public void updateVerifiedStatus(boolean status) {
+        this.verified = status;
+    }
 }
