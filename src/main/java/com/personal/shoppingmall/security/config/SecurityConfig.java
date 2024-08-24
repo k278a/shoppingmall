@@ -30,7 +30,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/api/public/**").permitAll()
                                 .requestMatchers("/api/users/**").permitAll()
-                                .requestMatchers("/api/sellers/signup").permitAll()
+                                .requestMatchers("/api/sellers/signup","/api/sellers/login").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
