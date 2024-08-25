@@ -24,9 +24,13 @@ public class Seller {
     private String encryptedBusinessAddress;
     private boolean verified; // 인증 상태
 
+    public void updateBusinessDetails(String encryptedBusinessNumber, String encryptedBusinessName, String encryptedBusinessAddress) {
+        this.encryptedBusinessNumber = encryptedBusinessNumber;
+        this.encryptedBusinessName = encryptedBusinessName;
+        this.encryptedBusinessAddress = encryptedBusinessAddress;
+    }
+
     public void updateVerifiedStatus(boolean verified) {
         this.verified = verified;
     }
-
-    // 더 이상 인증 상태와 역할 관련 메서드 제거됨
 }
