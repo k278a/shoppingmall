@@ -6,10 +6,7 @@ import com.personal.shoppingmall.exception.CustomException;
 import com.personal.shoppingmall.exception.ErrorCodes;
 import com.personal.shoppingmall.security.jwt.JwtTokenProvider;
 import com.personal.shoppingmall.security.util.EncryptionService;
-import com.personal.shoppingmall.seller.dto.SellerLoginRequestDto;
-import com.personal.shoppingmall.seller.dto.SellerLoginResponseDto;
-import com.personal.shoppingmall.seller.dto.SellerSignupRequestDto;
-import com.personal.shoppingmall.seller.dto.SellerSignupResponseDto;
+import com.personal.shoppingmall.seller.dto.*;
 import com.personal.shoppingmall.seller.entity.Seller;
 import com.personal.shoppingmall.seller.repository.SellerRepository;
 import org.slf4j.Logger;
@@ -21,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Base64;
 import java.util.regex.Pattern;
 
 @Service
@@ -61,7 +59,7 @@ public class SellerService {
         }
 
         // 비밀번호 검증
-        if (!isValidPassword(request.getPassword())) {
+        if (!isPasswordValid(request.getPassword())) {
             logger.warn("비밀번호 검증 실패: 비밀번호는 대소문자, 숫자, 특수문자를 포함해야 합니다.");
             throw new CustomException(ErrorCodes.SELLER_PASSWORD_VALIDATION_FAILED, "비밀번호는 대소문자, 숫자, 특수문자를 포함해야 합니다.");
         }
@@ -69,13 +67,18 @@ public class SellerService {
         // 비밀번호 암호화
         String encryptedPassword = passwordEncoder.encode(request.getPassword());
 
+        // 암호화
+        String encryptedBusinessNumber = encryptionService.encrypt(request.getBusinessNumber());
+        String encryptedBusinessName = encryptionService.encrypt(request.getBusinessName());
+        String encryptedBusinessAddress = encryptionService.encrypt(request.getBusinessAddress());
+
         // Seller 객체 생성 및 저장
         Seller seller = Seller.builder()
                 .email(request.getEmail())
                 .encryptedPassword(encryptedPassword)
-                .encryptedBusinessNumber(request.getBusinessNumber()) // 비즈니스 번호 암호화 로직 필요
-                .encryptedBusinessName(request.getBusinessName()) // 비즈니스 이름 암호화 로직 필요
-                .encryptedBusinessAddress(request.getBusinessAddress()) // 비즈니스 주소 암호화 로직 필요
+                .encryptedBusinessNumber(encryptedBusinessNumber)
+                .encryptedBusinessName(encryptedBusinessName)
+                .encryptedBusinessAddress(encryptedBusinessAddress)
                 .build();
 
         sellerRepository.save(seller);
@@ -89,11 +92,19 @@ public class SellerService {
         return new SellerSignupResponseDto("회원가입 성공. 인증 이메일을 확인하세요.");
     }
 
-    // 비밀번호 유효성 검사
-    private boolean isValidPassword(String password) {
-        // 비밀번호는 최소 8자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 함
-        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
-        return Pattern.compile(regex).matcher(password).matches();
+    private boolean isPasswordValid(String password) {
+        final String passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+        return Pattern.matches(passwordPattern, password);
+    }
+
+    private boolean isEmailValid(String email) {
+        final String emailPattern = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+        return Pattern.matches(emailPattern, email);
+    }
+
+    private boolean isPhoneNumberValid(String phoneNumber) {
+        final String phonePattern = "^010\\d{8}$";
+        return Pattern.matches(phonePattern, phoneNumber);
     }
 
     public String verifyEmail(String token) {
@@ -124,4 +135,49 @@ public class SellerService {
 
         return new ResponseEntity<>(new SellerLoginResponseDto("로그인 성공"), headers, HttpStatus.OK);
     }
+
+    @Transactional
+    public SellerResponseDto updateSeller(String email, SellerUpdateRequestDto sellerUpdateRequestDto) {
+        Seller seller = (Seller) sellerRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCodes.SELLER_NOT_FOUND, "판매자를 찾을 수 없습니다."));
+
+        // DTO에서 가져온 정보를 암호화
+        String encryptedBusinessNumber = encryptionService.encrypt(sellerUpdateRequestDto.getBusinessNumber());
+        String encryptedBusinessName = encryptionService.encrypt(sellerUpdateRequestDto.getBusinessName());
+        String encryptedBusinessAddress = encryptionService.encrypt(sellerUpdateRequestDto.getBusinessAddress());
+
+        // 엔티티에 암호화된 정보 업데이트
+        seller.updateBusinessDetails(encryptedBusinessNumber, encryptedBusinessName, encryptedBusinessAddress);
+        Seller updatedSeller = sellerRepository.save(seller);
+
+        // 복호화된 정보를 DTO로 반환
+        String decryptedBusinessNumber = encryptionService.decrypt(updatedSeller.getEncryptedBusinessNumber());
+        String decryptedBusinessName = encryptionService.decrypt(updatedSeller.getEncryptedBusinessName());
+        String decryptedBusinessAddress = encryptionService.decrypt(updatedSeller.getEncryptedBusinessAddress());
+
+        return new SellerResponseDto(
+                updatedSeller.getEmail(),
+                decryptedBusinessNumber,
+                decryptedBusinessName,
+                decryptedBusinessAddress
+        );
+    }
+
+    public SellerResponseDto getSellerByEmail(String email) {
+        Seller seller = (Seller) sellerRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCodes.SELLER_NOT_FOUND, "판매자를 찾을 수 없습니다."));
+
+        // 복호화된 정보를 DTO로 반환
+        String decryptedBusinessNumber = encryptionService.decrypt(seller.getEncryptedBusinessNumber());
+        String decryptedBusinessName = encryptionService.decrypt(seller.getEncryptedBusinessName());
+        String decryptedBusinessAddress = encryptionService.decrypt(seller.getEncryptedBusinessAddress());
+
+        return new SellerResponseDto(
+                seller.getEmail(),
+                decryptedBusinessNumber,
+                decryptedBusinessName,
+                decryptedBusinessAddress
+        );
+    }
+
 }

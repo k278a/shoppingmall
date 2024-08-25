@@ -52,6 +52,12 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testImplementation 'org.mockito:mockito-core:5.5.0' // Mockito 최신 버전
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3' // 최신 JUnit 5 버전
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.3' // 최신 JUnit 5 엔진 버전
+    testImplementation 'org.springframework.boot:spring-boot-starter-test' // Spring Boot가 버전 관리
+
 }
 
 tasks.named('test') {
