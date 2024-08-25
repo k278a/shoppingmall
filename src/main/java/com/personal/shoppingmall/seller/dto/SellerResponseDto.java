@@ -5,10 +5,10 @@ import lombok.Getter;
 @Getter
 public class SellerResponseDto {
     // Getters and setters
-    private String email;
-    private String businessNumber;
-    private String businessName;
-    private String businessAddress;
+    private final String email;
+    private final String businessNumber;
+    private final String businessName;
+    private final String businessAddress;
 
     public SellerResponseDto(String email, String businessNumber, String businessName, String businessAddress) {
         this.email = email;
