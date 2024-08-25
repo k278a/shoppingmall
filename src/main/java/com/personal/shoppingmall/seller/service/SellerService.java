@@ -17,8 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Base64;
 import java.util.regex.Pattern;
 
 @Service
@@ -46,6 +44,12 @@ public class SellerService {
     public SellerSignupResponseDto signupSeller(SellerSignupRequestDto request) {
         logger.info("판매자 회원가입 요청 수신: {}", request);
 
+        // 이메일 유효성 확인
+        if (!isEmailValid(request.getEmail())) {
+            logger.warn("잘못된 이메일 형식: {}", request.getEmail());
+            throw new CustomException(ErrorCodes.INVALID_EMAIL_FORMAT, "잘못된 이메일 형식입니다.");
+        }
+
         // 비밀번호 일치 확인
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             logger.warn("비밀번호 불일치: 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
@@ -62,6 +66,11 @@ public class SellerService {
         if (!isPasswordValid(request.getPassword())) {
             logger.warn("비밀번호 검증 실패: 비밀번호는 대소문자, 숫자, 특수문자를 포함해야 합니다.");
             throw new CustomException(ErrorCodes.SELLER_PASSWORD_VALIDATION_FAILED, "비밀번호는 대소문자, 숫자, 특수문자를 포함해야 합니다.");
+        }
+
+        if (request.getBusinessNumber() != null && !isPhoneNumberValid(request.getBusinessNumber())) {
+            logger.warn("잘못된 비즈니스 번호 형식: {}", request.getBusinessNumber());
+            throw new CustomException(ErrorCodes.INVALID_PHONE_NUMBER_FORMAT, "잘못된 비즈니스 번호 형식입니다.");
         }
 
         // 비밀번호 암호화
