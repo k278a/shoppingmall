@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class OrderDetailResponseDto {
 
-    private final Long id;                // 추가된 필드
+    private final Long id;        
     private final Long productId;
     private final Long price;
     private final int orderNumber;
