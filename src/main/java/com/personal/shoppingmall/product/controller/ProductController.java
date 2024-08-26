@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/products")
@@ -51,6 +53,12 @@ public class ProductController {
         String sellerEmail = jwtTokenProvider.getUsernameFromToken(token.replace("Bearer ", ""));
         productService.deleteSellerProduct(sellerEmail, productId);
         return ResponseEntity.ok().build();
+    }
+
+    // 모든 사용자에게 상품 목록 조회
+    @GetMapping
+    public ResponseEntity<List<ProductResponseDto>> getProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
 

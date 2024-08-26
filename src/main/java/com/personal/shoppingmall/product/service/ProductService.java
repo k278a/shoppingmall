@@ -11,6 +11,9 @@ import com.personal.shoppingmall.seller.repository.SellerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Service
 public class ProductService {
@@ -66,6 +69,24 @@ public class ProductService {
         return convertToDto(product);
     }
 
+    // 상품 삭제
+    @Transactional
+    public void deleteSellerProduct(String sellerEmail, Long productId) {
+        Seller seller = getSellerByEmail(sellerEmail);
+        Product product = productRepository.findByIdAndSeller(productId, seller)
+                .orElseThrow(() -> new CustomException(ErrorCodes.PRODUCT_NOT_FOUND, "제품을 찾을 수 없습니다."));
+
+        productRepository.delete(product);
+    }
+
+    // 모든 사용자가 상품 목록 조회
+    public List<ProductResponseDto> getAllProducts() {
+        return productRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+
     private Seller getSellerByEmail(String email) {
         return (Seller) sellerRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCodes.SELLER_NOT_FOUND, "셀러를 찾을 수 없습니다."));
@@ -81,15 +102,4 @@ public class ProductService {
                 product.getCategoryname()
         );
     }
-
-    // 상품 삭제
-    @Transactional
-    public void deleteSellerProduct(String sellerEmail, Long productId) {
-        Seller seller = getSellerByEmail(sellerEmail);
-        Product product = productRepository.findByIdAndSeller(productId, seller)
-                .orElseThrow(() -> new CustomException(ErrorCodes.PRODUCT_NOT_FOUND, "제품을 찾을 수 없습니다."));
-
-        productRepository.delete(product);
-    }
-
 }
