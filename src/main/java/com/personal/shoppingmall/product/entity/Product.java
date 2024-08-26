@@ -37,4 +37,13 @@ public class Product {
         this.seller = seller;
     }
 
+    // 업데이트 메서드
+    public void updateDetails(String productName, String productDescription, int productStock, Long price, String categoryname) {
+        this.productName = productName;
+        this.productDescription = productDescription;
+        this.productStock = productStock;
+        this.price = price;
+        this.categoryname = categoryname;
+    }
+
 }

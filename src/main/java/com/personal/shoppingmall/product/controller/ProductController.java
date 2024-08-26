@@ -32,4 +32,16 @@ public class ProductController {
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 
+    // 셀러 상품 수정
+    @PutMapping("/seller/{productId}")
+    public ResponseEntity<ProductResponseDto> updateSellerProduct(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long productId,
+            @RequestBody ProductRequestDto productRequestDto) {
+        String sellerEmail = jwtTokenProvider.getUsernameFromToken(token.replace("Bearer ", ""));
+        ProductResponseDto updatedProduct = productService.updateSellerProduct(sellerEmail, productId, productRequestDto);
+        return ResponseEntity.ok(updatedProduct);
+    }
+
+
 }

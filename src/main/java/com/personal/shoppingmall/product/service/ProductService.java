@@ -46,6 +46,26 @@ public class ProductService {
         return convertToDto(savedProduct);
     }
 
+
+    // 상품 수정
+    @Transactional
+    public ProductResponseDto updateSellerProduct(String sellerEmail, Long productId, ProductRequestDto productRequestDto) {
+        Seller seller = getSellerByEmail(sellerEmail);
+        Product product = productRepository.findByIdAndSeller(productId, seller)
+                .orElseThrow(() -> new CustomException(ErrorCodes.PRODUCT_NOT_FOUND, "제품을 찾을 수 없습니다."));
+
+        product.updateDetails(
+                productRequestDto.getProductName(),
+                productRequestDto.getProductDescription(),
+                productRequestDto.getProductStock(),
+                productRequestDto.getPrice(),
+                productRequestDto.getCategoryname()
+        );
+
+        productRepository.save(product);
+        return convertToDto(product);
+    }
+
     private Seller getSellerByEmail(String email) {
         return (Seller) sellerRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCodes.SELLER_NOT_FOUND, "셀러를 찾을 수 없습니다."));
