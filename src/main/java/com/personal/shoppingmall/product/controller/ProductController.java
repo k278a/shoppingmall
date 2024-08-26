@@ -43,5 +43,15 @@ public class ProductController {
         return ResponseEntity.ok(updatedProduct);
     }
 
+    // 셀러 상품 삭제
+    @DeleteMapping("/seller/{productId}")
+    public ResponseEntity<Void> deleteSellerProduct(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long productId) {
+        String sellerEmail = jwtTokenProvider.getUsernameFromToken(token.replace("Bearer ", ""));
+        productService.deleteSellerProduct(sellerEmail, productId);
+        return ResponseEntity.ok().build();
+    }
+
 
 }

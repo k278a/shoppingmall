@@ -82,4 +82,14 @@ public class ProductService {
         );
     }
 
+    // 상품 삭제
+    @Transactional
+    public void deleteSellerProduct(String sellerEmail, Long productId) {
+        Seller seller = getSellerByEmail(sellerEmail);
+        Product product = productRepository.findByIdAndSeller(productId, seller)
+                .orElseThrow(() -> new CustomException(ErrorCodes.PRODUCT_NOT_FOUND, "제품을 찾을 수 없습니다."));
+
+        productRepository.delete(product);
+    }
+
 }
