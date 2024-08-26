@@ -1,8 +1,9 @@
 package com.personal.shoppingmall.order.controller;
 
+import com.personal.shoppingmall.order.dto.OrderDeliveryStatusUpdateRequestDto;
 import com.personal.shoppingmall.order.dto.OrderRequestDto;
 import com.personal.shoppingmall.order.dto.OrderResponseDto;
-import com.personal.shoppingmall.order.entity.Order;
+import com.personal.shoppingmall.order.dto.OrderStatusUpdateRequestDto;
 import com.personal.shoppingmall.order.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,4 +28,24 @@ public class OrderController {
         return new ResponseEntity<>(orderResponseDto, HttpStatus.CREATED);
     }
 
+    @PutMapping("/status/{orderId}")
+    public ResponseEntity<OrderStatusUpdateRequestDto> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatusUpdateRequestDto orderStatusUpdateRequestDto) {
+        orderService.updateOrderStatus(orderId, orderStatusUpdateRequestDto.getOrderStatus());
+        return ResponseEntity.ok(orderStatusUpdateRequestDto);
+    }
+
+    @PutMapping("/delivery-status/{orderId}")
+    public ResponseEntity<String> updateOrderDeliveryStatus(
+            @PathVariable Long orderId,
+            @RequestBody OrderDeliveryStatusUpdateRequestDto requestDto) {
+        orderService.updateDeliveryStatus(orderId, requestDto.getDeliveryStatus());
+        return ResponseEntity.ok("Order delivery status updated");
+    }
+
+
+    @PutMapping("/cancel/{orderId}")
+    public ResponseEntity<String> cancelOrder(@PathVariable Long orderId) {
+        orderService.cancelOrder(orderId);
+        return ResponseEntity.ok("Order canceled");
+    }
 }

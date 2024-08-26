@@ -44,4 +44,13 @@ public class Order {
         this.orderDetails = orderDetails;
     }
 
+    public void updateOrderStatus(String newStatus) {
+        this.orderStatus = newStatus;
+        this.updatedAt = LocalDateTime.now(); // 상태 업데이트 시, 업데이트 시간을 갱신
+    }
+
+    public void updateDeliveryStatus(String deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

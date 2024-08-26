@@ -31,6 +31,12 @@ public class ErrorCodes {
     public static final String PRODUCT_ALREADY_EXISTS = SELLER_ERROR_PREFIX + "PRODUCT_ALREADY_EXISTS";
     public static final String PRODUCT_NOT_FOUND = SELLER_ERROR_PREFIX + "PRODUCT_NOT_FOUND";
 
+    // 주문 관련 오류 코드
+    public static final String ORDER_ERROR_PREFIX = "ORDER_ERROR_";
+    public static final String ORDER_CREATION_FAILED = ORDER_ERROR_PREFIX + "CREATION_FAILED";
+    public static final String ORDER_NOT_FOUND = ORDER_ERROR_PREFIX + "NOT_FOUND";
+
+
     // 이메일 인증 관련
     public static final String INVALID_TOKEN = "INVALID_TOKEN";
 }
