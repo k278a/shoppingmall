@@ -7,10 +7,7 @@ import com.personal.shoppingmall.exception.ErrorCodes;
 import com.personal.shoppingmall.security.jwt.JwtTokenProvider;
 import com.personal.shoppingmall.security.entity.RoleName;
 import com.personal.shoppingmall.security.util.EncryptionService;
-import com.personal.shoppingmall.user.dto.LoginRequest;
-import com.personal.shoppingmall.user.dto.LoginResponse;
-import com.personal.shoppingmall.user.dto.SignupRequest;
-import com.personal.shoppingmall.user.dto.SignupResponse;
+import com.personal.shoppingmall.user.dto.*;
 import com.personal.shoppingmall.user.entity.User;
 import com.personal.shoppingmall.user.repository.UserRepository;
 import org.slf4j.Logger;
@@ -166,5 +163,43 @@ public class UserService {
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken);
 
         return new ResponseEntity<>(new LoginResponse("로그인 성공"), headers, HttpStatus.OK);
+    }
+
+    public UserUpdateResponseDto updateUser(String token, UserUpdateRequestDto request) {
+        // 토큰에서 이메일 추출
+        String email = jwtTokenProvider.getUsernameFromToken(token);
+
+        // 유저를 DB에서 조회
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        // 암호화할 필드 업데이트
+        String encryptedPhoneNumber = encryptionService.encrypt(request.getPhoneNumber());
+        String encryptedAddress = encryptionService.encrypt(request.getAddress());
+
+        // 유저의 프로필 정보 업데이트
+        user.update(request.getName(), encryptedPhoneNumber, encryptedAddress);
+
+        // 변경 사항 저장
+        userRepository.save(user);
+
+        // 응답 생성 및 반환
+        return new UserUpdateResponseDto("Profile updated successfully");
+    }
+    public UserProfileResponseDto getUserProfile(String token) {
+        // 토큰에서 이메일 추출
+        String email = jwtTokenProvider.getUsernameFromToken(token);
+
+        // 유저를 DB에서 조회
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        // 사용자 정보를 담은 DTO 반환
+        return new UserProfileResponseDto(
+                user.getName(),
+                user.getEmail(),
+                encryptionService.decrypt(user.getPhoneNumber()),  // 암호화된 정보를 복호화
+                encryptionService.decrypt(user.getAddress())     // 암호화된 정보를 복호화
+        );
     }
 }

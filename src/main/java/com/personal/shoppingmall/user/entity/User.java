@@ -53,4 +53,10 @@ public class User {
     public List<RoleName> getRoles() {
         return Collections.singletonList(role);
     }
+
+    public void update(String name, String phoneNumber, String address) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
 }
