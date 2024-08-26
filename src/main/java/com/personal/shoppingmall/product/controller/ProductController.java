@@ -60,6 +60,4 @@ public class ProductController {
     public ResponseEntity<List<ProductResponseDto>> getProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
-
-
 }
