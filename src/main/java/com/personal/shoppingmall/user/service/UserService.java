@@ -5,6 +5,7 @@ import com.personal.shoppingmall.email.service.EmailVerificationService;
 import com.personal.shoppingmall.exception.CustomException;
 import com.personal.shoppingmall.exception.ErrorCodes;
 import com.personal.shoppingmall.security.jwt.JwtTokenProvider;
+import com.personal.shoppingmall.security.entity.RoleName;
 import com.personal.shoppingmall.security.util.EncryptionService;
 import com.personal.shoppingmall.user.dto.LoginRequest;
 import com.personal.shoppingmall.user.dto.LoginResponse;
@@ -97,13 +98,14 @@ public class UserService {
         logger.info("전화번호 암호화: {}", encryptedPhoneNumber);
         logger.info("주소 암호화: {}", encryptedAddress);
 
-        // 사용자 생성 및 저장
+        // 사용자 생성 및 저장 (기본 역할은 USER로 설정)
         User user = new User(
                 request.getName(),
                 request.getEmail(),
                 encryptedPassword,
                 encryptedPhoneNumber,
-                encryptedAddress
+                encryptedAddress,
+                RoleName.USER // 기본 역할 설정
         );
         userRepository.save(user);
 
@@ -157,7 +159,7 @@ public class UserService {
             throw new CustomException(ErrorCodes.INVALID_PASSWORD, "비밀번호가 잘못되었습니다.");
         }
 
-        String jwtToken = jwtTokenProvider.createToken(user.getEmail());
+        String jwtToken = jwtTokenProvider.createToken(user.getEmail(), user.getRole().getAuthority());
         logger.info("로그인 성공: {} - JWT 토큰 생성", user.getEmail());
 
         HttpHeaders headers = new HttpHeaders();

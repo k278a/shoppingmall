@@ -4,14 +4,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 @Component
@@ -20,12 +19,18 @@ public class JwtTokenProvider {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
-    @Getter
     @Value("${jwt.expiration}")
     private long validityInMilliseconds;
 
-    public String createToken(String email) {
+    private final UserDetailsService userDetailsService;
+
+    public JwtTokenProvider(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    public String createToken(String email, String role) {
         Claims claims = Jwts.claims().setSubject(email);
+        claims.put("roles", role); // 역할을 클레임에 추가
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
@@ -49,6 +54,11 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
+    public String getRoleFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return (String) claims.get("roles");
+    }
+
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
@@ -60,7 +70,7 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         String email = getUsernameFromToken(token);
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(email, "", new ArrayList<>());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }
 
