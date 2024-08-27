@@ -1,5 +1,7 @@
 package com.personal.shoppingmall.user.service;
 
+import com.personal.shoppingmall.email.entity.UserEmailVerificationToken;
+import com.personal.shoppingmall.email.repository.UserEmailVerificationTokenRepository;
 import com.personal.shoppingmall.email.service.EmailService;
 import com.personal.shoppingmall.email.service.EmailVerificationService;
 import com.personal.shoppingmall.exception.CustomException;
@@ -33,6 +35,8 @@ public class UserService {
     private final EmailService emailService;
     private final EmailVerificationService emailVerificationService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserEmailVerificationTokenRepository userTokenRepository;
+
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -40,13 +44,15 @@ public class UserService {
                        EncryptionService encryptionService,
                        EmailService emailService,
                        EmailVerificationService emailVerificationService,
-                       JwtTokenProvider jwtTokenProvider) {
+                       JwtTokenProvider jwtTokenProvider,
+                       UserEmailVerificationTokenRepository userTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.encryptionService = encryptionService;
         this.emailService = emailService;
         this.emailVerificationService = emailVerificationService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userTokenRepository = userTokenRepository;
     }
 
     public SignupResponse signupUser(SignupRequest request) {
@@ -133,8 +139,29 @@ public class UserService {
     }
 
     public String verifyEmail(String token) {
-        return emailVerificationService.verifyEmail(token);
+        System.out.println("Token received: " + token);
+        Optional<UserEmailVerificationToken> userTokenOpt = userTokenRepository.findByToken(token);
+        if (userTokenOpt.isPresent()) {
+            UserEmailVerificationToken userToken = userTokenOpt.get();
+            System.out.println("Token found: " + userToken.getToken());
+            if (userToken.isExpired()) {
+                System.out.println("Token expired");
+                throw new CustomException(ErrorCodes.INVALID_TOKEN, "유효하지 않거나 만료된 토큰입니다.");
+            }
+            User user = userToken.getUser();
+            if (user != null) {
+                user.updateVerifiedStatus(true); // 사용자 인증 상태 업데이트
+                userRepository.save(user); // 사용자 저장
+            }
+            return "이메일 인증이 완료되었습니다.";
+        }
+        System.out.println("Token not found");
+        throw new CustomException(ErrorCodes.INVALID_TOKEN, "유효하지 않거나 만료된 토큰입니다.");
     }
+
+
+
+
 
     public ResponseEntity<LoginResponse> loginUser(LoginRequest request) {
         Optional<User> userOpt = userRepository.findByEmail(request.getEmail());

@@ -27,7 +27,7 @@ public class ErrorCodes {
     public static final String SELLER_PASSWORD_VALIDATION_FAILED = SELLER_ERROR_PREFIX + "PASSWORD_VALIDATION_FAILED";
     public static final String SELLER_NOT_FOUND = SELLER_ERROR_PREFIX + "SELLER_NOT_FOUND";
 
-    //제품 관련 코드
+    // 제품 관련 코드
     public static final String PRODUCT_ALREADY_EXISTS = SELLER_ERROR_PREFIX + "PRODUCT_ALREADY_EXISTS";
     public static final String PRODUCT_NOT_FOUND = SELLER_ERROR_PREFIX + "PRODUCT_NOT_FOUND";
 
@@ -36,7 +36,7 @@ public class ErrorCodes {
     public static final String ORDER_CREATION_FAILED = ORDER_ERROR_PREFIX + "CREATION_FAILED";
     public static final String ORDER_NOT_FOUND = ORDER_ERROR_PREFIX + "NOT_FOUND";
 
-
-    // 이메일 인증 관련
+    // 이메일 인증 관련 오류 코드 추가
     public static final String INVALID_TOKEN = "INVALID_TOKEN";
+    public static final String INVALID_VERIFICATION_TOKEN = "INVALID_VERIFICATION_TOKEN";
 }
