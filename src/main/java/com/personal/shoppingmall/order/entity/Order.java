@@ -24,7 +24,6 @@ public class Order {
     private String userEmail;
     private Long totalPrice;
     private String orderStatus;
-    private String deliveryStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -34,11 +33,10 @@ public class Order {
     public Order() {
     }
 
-    public Order(String userEmail, Long totalPrice, String orderStatus, String deliveryStatus, LocalDateTime createdAt, LocalDateTime updatedAt, List<OrderDetail> orderDetails) {
+    public Order(String userEmail, Long totalPrice, String orderStatus, LocalDateTime createdAt, LocalDateTime updatedAt, List<OrderDetail> orderDetails) {
         this.userEmail = userEmail;
         this.totalPrice = totalPrice;
         this.orderStatus = orderStatus;
-        this.deliveryStatus = deliveryStatus;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.orderDetails = orderDetails;
@@ -49,8 +47,4 @@ public class Order {
         this.updatedAt = LocalDateTime.now(); // 상태 업데이트 시, 업데이트 시간을 갱신
     }
 
-    public void updateDeliveryStatus(String deliveryStatus) {
-        this.deliveryStatus = deliveryStatus;
-        this.updatedAt = LocalDateTime.now();
-    }
 }

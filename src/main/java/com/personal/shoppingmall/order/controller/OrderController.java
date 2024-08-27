@@ -1,6 +1,5 @@
 package com.personal.shoppingmall.order.controller;
 
-import com.personal.shoppingmall.order.dto.OrderDeliveryStatusUpdateRequestDto;
 import com.personal.shoppingmall.order.dto.OrderRequestDto;
 import com.personal.shoppingmall.order.dto.OrderResponseDto;
 import com.personal.shoppingmall.order.dto.OrderStatusUpdateRequestDto;
@@ -32,14 +31,6 @@ public class OrderController {
     public ResponseEntity<OrderStatusUpdateRequestDto> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatusUpdateRequestDto orderStatusUpdateRequestDto) {
         orderService.updateOrderStatus(orderId, orderStatusUpdateRequestDto.getOrderStatus());
         return ResponseEntity.ok(orderStatusUpdateRequestDto);
-    }
-
-    @PutMapping("/delivery-status/{orderId}")
-    public ResponseEntity<String> updateOrderDeliveryStatus(
-            @PathVariable Long orderId,
-            @RequestBody OrderDeliveryStatusUpdateRequestDto requestDto) {
-        orderService.updateDeliveryStatus(orderId, requestDto.getDeliveryStatus());
-        return ResponseEntity.ok("Order delivery status updated");
     }
 
 

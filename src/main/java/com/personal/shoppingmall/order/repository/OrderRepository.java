@@ -9,6 +9,8 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findByDeliveryStatusAndUpdatedAtBefore(String deliveryStatus, LocalDateTime updatedBefore);
+    List<Order> findByOrderStatusAndUpdatedAtBefore(String orderStatus, LocalDateTime updatedAt);
+    List<Order> findByOrderStatusAndCreatedAtBefore(String orderStatus, LocalDateTime createdAt);
+
     // 필요에 따라 추가 쿼리 메서드 정의 가능
 }

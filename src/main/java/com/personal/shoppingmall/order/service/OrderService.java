@@ -47,7 +47,6 @@ public class OrderService {
                 userEmail,
                 calculateTotalPrice(orderRequestDto),
                 "준비중",
-                "준비중",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 List.of()  // 초기 주문 세부사항 리스트는 빈 상태
@@ -89,7 +88,6 @@ public class OrderService {
                 order.getUserEmail(),
                 order.getTotalPrice(),
                 order.getOrderStatus(),
-                order.getDeliveryStatus(),
                 order.getCreatedAt(),
                 order.getUpdatedAt(),
                 orderDetailDtos
@@ -105,23 +103,26 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    @Transactional
-    public void updateDeliveryStatus(Long orderId, String deliveryStatus) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new CustomException(ORDER_NOT_FOUND,"Order not found"));
 
-        order.updateDeliveryStatus(deliveryStatus);
-        orderRepository.save(order);
-    }
+    @Scheduled(fixedRate = 24 * 60 * 60 * 1000) // 매일 24시간마다 실행
+    public void updateOrderStatus() {
+        LocalDateTime now = LocalDateTime.now();
 
-    @Scheduled(fixedRate = 24 * 60 * 60 * 1000) // 24시간마다 실행
-    public void autoUpdateDeliveryStatus() {
-        LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
+        // 1일이 지나서 상태가 '준비중'인 주문을 '배송중'으로 업데이트
+        LocalDateTime oneDayAgo = now.minusDays(1);
+        List<Order> ordersToUpdateToShipping = orderRepository.findByOrderStatusAndCreatedAtBefore("준비중", oneDayAgo);
 
-        List<Order> orders = orderRepository.findByDeliveryStatusAndUpdatedAtBefore("배송중", twoDaysAgo);
+        for (Order order : ordersToUpdateToShipping) {
+            order.updateOrderStatus("배송중");
+            orderRepository.save(order);
+        }
 
-        for (Order order : orders) {
-            order.updateDeliveryStatus("배송 완료");
+        // 2일이 지나서 상태가 '배송중'인 주문을 '배송 완료'로 업데이트
+        LocalDateTime twoDaysAgo = now.minusDays(2);
+        List<Order> ordersToUpdateToComplete = orderRepository.findByOrderStatusAndUpdatedAtBefore("배송중", twoDaysAgo);
+
+        for (Order order : ordersToUpdateToComplete) {
+            order.updateOrderStatus("배송 완료");
             orderRepository.save(order);
         }
     }
@@ -133,7 +134,7 @@ public class OrderService {
 
         // 상태가 "Pending"이거나 배송 완료 후 1일 이내인 경우에만 취소 가능
         boolean isCancelable = "준비중".equals(order.getOrderStatus()) ||
-                ("배송 완료".equals(order.getDeliveryStatus()) && order.getCreatedAt().isAfter(LocalDateTime.now().minusDays(1)));
+                ("배송 완료".equals(order.getOrderStatus()) && order.getCreatedAt().isAfter(LocalDateTime.now().minusDays(1)));
 
         if (isCancelable) {
             order.updateOrderStatus("취소됨");
