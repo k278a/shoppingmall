@@ -30,4 +30,13 @@ public class WishListItem {
         this.wishList = wishList;
     }
 
+
+    // New method to update quantity
+    public void updateQuantity(int quantity) {
+        if (quantity >= 0) {
+            this.quantity = quantity;
+        } else {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
+    }
 }

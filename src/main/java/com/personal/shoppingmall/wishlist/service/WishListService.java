@@ -8,6 +8,7 @@ import com.personal.shoppingmall.user.entity.User;
 import com.personal.shoppingmall.user.repository.UserRepository;
 import com.personal.shoppingmall.wishlist.dto.WishListItemRequestDto;
 import com.personal.shoppingmall.wishlist.dto.WishListItemResponseDto;
+import com.personal.shoppingmall.wishlist.dto.WishListItemUpdateRequestDto;
 import com.personal.shoppingmall.wishlist.entity.WishList;
 import com.personal.shoppingmall.wishlist.entity.WishListItem;
 import com.personal.shoppingmall.wishlist.repository.WishListItemRepository;
@@ -53,6 +54,34 @@ public class WishListService {
         );
 
         // Directly save without try-catch
+        wishListItem = wishListItemRepository.save(wishListItem);
+
+        return new WishListItemResponseDto(
+                wishListItem.getId(),
+                wishListItem.getProductName(),
+                wishListItem.getProductDescription(),
+                wishListItem.getPrice(),
+                wishListItem.getQuantity()
+        );
+    }
+
+    @Transactional
+    public WishListItemResponseDto updateQuantity(String email, Long itemId, int quantity) {
+        if (quantity < 0) {
+            throw new CustomException(ErrorCodes.INVALID_QUANTITY, "Quantity cannot be negative");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND, "User not found with email: " + email));
+
+        WishList wishList = wishListRepository.findByUser(user)
+                .orElseThrow(() -> new CustomException(ErrorCodes.WISHLIST_NOT_FOUND, "Wishlist not found for user: " + email));
+
+        WishListItem wishListItem = wishListItemRepository.findById(itemId)
+                .filter(item -> item.getWishList().equals(wishList))
+                .orElseThrow(() -> new CustomException(ErrorCodes.WISHLIST_ITEM_NOT_FOUND, "Wishlist item not found with ID: " + itemId));
+
+        wishListItem.updateQuantity(quantity);
         wishListItem = wishListItemRepository.save(wishListItem);
 
         return new WishListItemResponseDto(

@@ -1,6 +1,7 @@
 package com.personal.shoppingmall.wishlist.controller;
 
 import com.personal.shoppingmall.wishlist.dto.WishListItemRequestDto;
+import com.personal.shoppingmall.wishlist.dto.WishListItemUpdateRequestDto;
 import com.personal.shoppingmall.wishlist.dto.WishListItemResponseDto;
 import com.personal.shoppingmall.wishlist.service.WishListService;
 import com.personal.shoppingmall.security.jwt.JwtTokenProvider;
@@ -34,4 +35,15 @@ public class WishListController {
         }
     }
 
+    @PutMapping("/items/{itemId}")
+    public ResponseEntity<WishListItemResponseDto> updateQuantity(HttpServletRequest request, @PathVariable Long itemId, @RequestBody WishListItemUpdateRequestDto updateRequestDto) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getUsernameFromToken(token);
+            WishListItemResponseDto responseDto = wishListService.updateQuantity(email, itemId, updateRequestDto.getQuantity());
+            return ResponseEntity.ok(responseDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized
+        }
+    }
 }
