@@ -46,4 +46,16 @@ public class WishListController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized
         }
     }
+
+    @DeleteMapping("/items/{itemId}")
+    public ResponseEntity<Void> deleteWishListItem(HttpServletRequest request, @PathVariable Long itemId) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getUsernameFromToken(token);
+            wishListService.deleteWishListItem(email, itemId);
+            return ResponseEntity.noContent().build(); // No Content
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized
+        }
+    }
 }

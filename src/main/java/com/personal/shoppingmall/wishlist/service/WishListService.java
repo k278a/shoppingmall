@@ -53,7 +53,6 @@ public class WishListService {
                 wishList
         );
 
-        // Directly save without try-catch
         wishListItem = wishListItemRepository.save(wishListItem);
 
         return new WishListItemResponseDto(
@@ -91,5 +90,20 @@ public class WishListService {
                 wishListItem.getPrice(),
                 wishListItem.getQuantity()
         );
+    }
+
+    @Transactional
+    public void deleteWishListItem(String email, Long itemId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND, "User not found with email: " + email));
+
+        WishList wishList = wishListRepository.findByUser(user)
+                .orElseThrow(() -> new CustomException(ErrorCodes.WISHLIST_NOT_FOUND, "Wishlist not found for user: " + email));
+
+        WishListItem wishListItem = wishListItemRepository.findById(itemId)
+                .filter(item -> item.getWishList().equals(wishList))
+                .orElseThrow(() -> new CustomException(ErrorCodes.WISHLIST_ITEM_NOT_FOUND, "Wishlist item not found with ID: " + itemId));
+
+        wishListItemRepository.delete(wishListItem);
     }
 }
