@@ -3,7 +3,6 @@ package com.personal.shoppingmall.wishlist.service;
 import com.personal.shoppingmall.exception.CustomException;
 import com.personal.shoppingmall.exception.ErrorCodes;
 import com.personal.shoppingmall.order.dto.OrderDetailRequestDto;
-import com.personal.shoppingmall.order.dto.OrderDetailResponseDto;
 import com.personal.shoppingmall.order.dto.OrderRequestDto;
 import com.personal.shoppingmall.order.dto.OrderResponseDto;
 import com.personal.shoppingmall.order.service.OrderService;
@@ -19,9 +18,9 @@ import com.personal.shoppingmall.wishlist.repository.WishListRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class WishListService {
