@@ -19,18 +19,9 @@ public class WishList {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private WishListStatus status;
 
     public WishList(User user) {
         this.user = user;
-        this.status = WishListStatus.ACTIVE;
     }
 
-    public enum WishListStatus {
-        ACTIVE,
-        INACTIVE,
-        PURCHASED
-    }
 }

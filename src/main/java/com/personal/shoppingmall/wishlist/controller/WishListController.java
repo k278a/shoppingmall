@@ -1,8 +1,6 @@
 package com.personal.shoppingmall.wishlist.controller;
 
-import com.personal.shoppingmall.wishlist.dto.WishListItemRequestDto;
-import com.personal.shoppingmall.wishlist.dto.WishListItemUpdateRequestDto;
-import com.personal.shoppingmall.wishlist.dto.WishListItemResponseDto;
+import com.personal.shoppingmall.wishlist.dto.*;
 import com.personal.shoppingmall.wishlist.service.WishListService;
 import com.personal.shoppingmall.security.jwt.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
@@ -53,9 +51,25 @@ public class WishListController {
         if (token != null && jwtTokenProvider.validateToken(token)) {
             String email = jwtTokenProvider.getUsernameFromToken(token);
             wishListService.deleteWishListItem(email, itemId);
-            return ResponseEntity.noContent().build(); // No Content
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized
         }
     }
+
+    @PostMapping("/items/{itemId}/order")
+    public ResponseEntity<WishListOrderResponseDto> orderWishListItem(HttpServletRequest request, @PathVariable Long itemId) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getUsernameFromToken(token);
+
+            // 서비스 호출
+            WishListOrderResponseDto responseDto = wishListService.orderWishListItem(email, itemId);
+            return ResponseEntity.ok(responseDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized
+        }
+    }
+
+
 }
