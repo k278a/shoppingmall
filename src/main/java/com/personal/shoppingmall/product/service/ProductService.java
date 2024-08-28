@@ -102,4 +102,25 @@ public class ProductService {
                 product.getCategoryname()
         );
     }
+
+    // 상품 재고 차감
+    @Transactional
+    public void reduceProductStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new CustomException(ErrorCodes.PRODUCT_NOT_FOUND, "제품을 찾을 수 없습니다."));
+
+        if (product.getProductStock() < quantity) {
+            throw new CustomException(ErrorCodes.OUT_OF_STOCK, "재고가 부족합니다.");
+        }
+
+        productRepository.save(new Product(
+                product.getId(),
+                product.getProductName(),
+                product.getProductDescription(),
+                product.getProductStock() - quantity,
+                product.getPrice(),
+                product.getCategoryname(),
+                product.getSeller()
+        ));
+    }
 }

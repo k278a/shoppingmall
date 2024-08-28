@@ -11,6 +11,7 @@ import com.personal.shoppingmall.order.repository.OrderDetailRepository;
 import com.personal.shoppingmall.order.repository.OrderRepository;
 import com.personal.shoppingmall.product.entity.Product;
 import com.personal.shoppingmall.product.repository.ProductRepository;
+import com.personal.shoppingmall.product.service.ProductService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,11 +30,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
+    private final ProductService productService;
 
-    public OrderService(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, ProductRepository productRepository,ProductService productService) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.productRepository = productRepository;
+        this.productService = productService;
     }
 
     @Transactional
@@ -58,7 +61,14 @@ public class OrderService {
         // 주문 세부사항 처리 및 저장
         for (var detailDto : orderRequestDto.getOrderDetails()) {
             Product product = productRepository.findById(detailDto.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+                    .orElseThrow(() -> new CustomException(ErrorCodes.PRODUCT_NOT_FOUND, "Product not found"));
+
+            if (product.getProductStock() < detailDto.getOrderNumber()) {
+                throw new CustomException(ErrorCodes.OUT_OF_STOCK, "재고가 부족합니다.");
+            }
+
+            // 재고 차감
+            productService.reduceProductStock(product.getId(), detailDto.getOrderNumber());
 
             OrderDetail orderDetail = new OrderDetail(
                     order,
