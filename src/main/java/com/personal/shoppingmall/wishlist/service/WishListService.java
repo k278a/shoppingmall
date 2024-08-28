@@ -8,6 +8,7 @@ import com.personal.shoppingmall.order.dto.OrderResponseDto;
 import com.personal.shoppingmall.order.service.OrderService;
 import com.personal.shoppingmall.product.entity.Product;
 import com.personal.shoppingmall.product.repository.ProductRepository;
+import com.personal.shoppingmall.product.service.ProductService;
 import com.personal.shoppingmall.user.entity.User;
 import com.personal.shoppingmall.user.repository.UserRepository;
 import com.personal.shoppingmall.wishlist.dto.*;
@@ -30,17 +31,20 @@ public class WishListService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final OrderService orderService;
+    private final ProductService productService;
 
     public WishListService(WishListRepository wishListRepository,
                            WishListItemRepository wishListItemRepository,
                            UserRepository userRepository,
                            ProductRepository productRepository,
-                           OrderService orderService) {
+                           OrderService orderService,
+                           ProductService productService) {
         this.wishListRepository = wishListRepository;
         this.wishListItemRepository = wishListItemRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.orderService = orderService;
+        this.productService = productService;
     }
 
     @Transactional
@@ -137,6 +141,9 @@ public class WishListService {
         // 수량을 단순히 가져오기
         int quantity = wishListItem.getQuantity();
 
+        // 상품 재고 확인 및 차감
+        productService.reduceProductStock(wishListItem.getProductId(), quantity);
+
         // 주문 요청 DTO 생성
         OrderRequestDto orderRequestDto = new OrderRequestDto(
                 List.of(new OrderDetailRequestDto(
@@ -164,6 +171,7 @@ public class WishListService {
                 ))
         );
     }
+
 
 }
 
