@@ -1,0 +1,75 @@
+package com.personal.shoppingmall.wishlist.controller;
+
+import com.personal.shoppingmall.wishlist.dto.*;
+import com.personal.shoppingmall.wishlist.service.WishListService;
+import com.personal.shoppingmall.security.jwt.JwtTokenProvider;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@RestController
+@RequestMapping("/api/wishlist")
+public class WishListController {
+
+    private final WishListService wishListService;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public WishListController(WishListService wishListService, JwtTokenProvider jwtTokenProvider) {
+        this.wishListService = wishListService;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    @PostMapping("/items")
+    public ResponseEntity<WishListItemResponseDto> addToWishList(HttpServletRequest request, @RequestBody WishListItemRequestDto wishListItemRequestDto) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getUsernameFromToken(token);
+            WishListItemResponseDto responseDto = wishListService.addToWishList(email, wishListItemRequestDto);
+            return ResponseEntity.ok(responseDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized
+        }
+    }
+
+    @PutMapping("/items/{itemId}")
+    public ResponseEntity<WishListItemResponseDto> updateQuantity(HttpServletRequest request, @PathVariable Long itemId, @RequestBody WishListItemUpdateRequestDto updateRequestDto) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getUsernameFromToken(token);
+            WishListItemResponseDto responseDto = wishListService.updateQuantity(email, itemId, updateRequestDto.getQuantity());
+            return ResponseEntity.ok(responseDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized
+        }
+    }
+
+    @DeleteMapping("/items/{itemId}")
+    public ResponseEntity<Void> deleteWishListItem(HttpServletRequest request, @PathVariable Long itemId) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getUsernameFromToken(token);
+            wishListService.deleteWishListItem(email, itemId);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized
+        }
+    }
+
+    @PostMapping("/items/{itemId}/order")
+    public ResponseEntity<WishListOrderResponseDto> orderWishListItem(HttpServletRequest request, @PathVariable Long itemId) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getUsernameFromToken(token);
+
+            // 서비스 호출
+            WishListOrderResponseDto responseDto = wishListService.orderWishListItem(email, itemId);
+            return ResponseEntity.ok(responseDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized
+        }
+    }
+
+
+}

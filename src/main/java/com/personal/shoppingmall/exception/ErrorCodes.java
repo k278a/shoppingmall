@@ -28,8 +28,9 @@ public class ErrorCodes {
     public static final String SELLER_NOT_FOUND = SELLER_ERROR_PREFIX + "SELLER_NOT_FOUND";
 
     // 제품 관련 코드
-    public static final String PRODUCT_ALREADY_EXISTS = SELLER_ERROR_PREFIX + "PRODUCT_ALREADY_EXISTS";
-    public static final String PRODUCT_NOT_FOUND = SELLER_ERROR_PREFIX + "PRODUCT_NOT_FOUND";
+    public static final String PRODUCT_ERROR_PREFIX = "PRODUCT_ERROR_";
+    public static final String PRODUCT_ALREADY_EXISTS = PRODUCT_ERROR_PREFIX + "PRODUCT_ALREADY_EXISTS";
+    public static final String PRODUCT_NOT_FOUND = PRODUCT_ERROR_PREFIX + "PRODUCT_NOT_FOUND";
 
     // 주문 관련 오류 코드
     public static final String ORDER_ERROR_PREFIX = "ORDER_ERROR_";
@@ -38,5 +39,10 @@ public class ErrorCodes {
 
     // 이메일 인증 관련 오류 코드 추가
     public static final String INVALID_TOKEN = "INVALID_TOKEN";
-    public static final String INVALID_VERIFICATION_TOKEN = "INVALID_VERIFICATION_TOKEN";
+
+    // 위시리스트 관련 오류 코드
+    public static final String WISHLIST_ERROR_PREFIX = "WISHLIST_ERROR_";
+    public static final String WISHLIST_NOT_FOUND = WISHLIST_ERROR_PREFIX + "WISHLIST_NOT_FOUND";
+    public static final String WISHLIST_ITEM_NOT_FOUND = WISHLIST_ERROR_PREFIX + "WISHLIST_ITEM_NOT_FOUND";
+    public static final String INVALID_QUANTITY = WISHLIST_ERROR_PREFIX + "INVALID_QUANTITY";
 }

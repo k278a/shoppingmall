@@ -13,8 +13,13 @@ public class  EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${email.verification.url}")
-    private String verificationUrl;
+    @Value("${email.verification.url.user}")
+    private String userVerificationUrl;
+
+    @Value("${email.verification.url.seller}")
+    private String sellerVerificationUrl;
+
+
 
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -22,7 +27,7 @@ public class  EmailService {
 
     public void sendVerificationEmail(User user, String token) {
         String subject = "Email Verification";
-        String confirmationUrl = verificationUrl + "/" + token;
+        String confirmationUrl = userVerificationUrl + "/" + token;
 
         String text = "Please verify your email by clicking the link below:\n" + confirmationUrl;
 
@@ -36,7 +41,7 @@ public class  EmailService {
 
     public void sendVerificationEmail(Seller seller, String token) {
         String subject = "Email Verification";
-        String confirmationUrl = verificationUrl + "/" + token;
+        String confirmationUrl = sellerVerificationUrl + "/" + token;
 
         String text = "Please verify your email by clicking the link below:\n" + confirmationUrl;
 
