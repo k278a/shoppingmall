@@ -38,5 +38,9 @@ public class ErrorCodes {
 
     // 이메일 인증 관련 오류 코드 추가
     public static final String INVALID_TOKEN = "INVALID_TOKEN";
-    public static final String INVALID_VERIFICATION_TOKEN = "INVALID_VERIFICATION_TOKEN";
+
+    // 위시리스트 관련 오류 코드
+    public static final String WISHLIST_ERROR_PREFIX = "WISHLIST_ERROR_";
+    public static final String WISHLIST_NOT_FOUND = WISHLIST_ERROR_PREFIX + "WISHLIST_NOT_FOUND";
+    public static final String ITEM_NOT_SAVED = WISHLIST_ERROR_PREFIX + "ITEM_NOT_SAVED";
 }

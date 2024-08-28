@@ -30,7 +30,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/api/public/**").permitAll()
                                 .requestMatchers("/api/users/**").permitAll()
-                                .requestMatchers("/api/sellers/signup", "/api/sellers/login").permitAll()
+                                .requestMatchers("/api/sellers/signup", "/api/sellers/login","/api/sellers/verify/**").permitAll()
                                 .requestMatchers("/api/products").permitAll()
                                 .requestMatchers("/api/products/seller/**").hasRole("SELLER") // SELLER 권한을 가진 사용자만 접근 허용
                                 .anyRequest().authenticated()
